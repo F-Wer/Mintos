@@ -1,0 +1,4 @@
+Account.txt
+.git/
+.idea/
+venv/
