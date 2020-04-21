@@ -1,26 +1,25 @@
 import codecs
-import os
 import smtplib
 import ssl
 import time
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from selenium import webdriver
 
 from secret import *
 
 
-class scrape_Mintos(object):
-    def Scrape(self):
+class ScrapeMintos(object):
+    def scrape(self):
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
         # Options for headless and to circumvent captchas
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
-        options.binary_location = r'C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe'
         print('Opening Chrome')
-        driver_path: str = r'D:\Python\webdriver\chromedriver.exe'
-        driver = webdriver.Chrome(options=options, executable_path=driver_path)
+        driver = webdriver.Chrome(options=options)
         driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": {"User-Agent": "browserClientA"}})
         driver.get("https://www.mintos.com/de/login")
         inputElement_user = driver.find_element_by_id("login-username")
@@ -44,23 +43,28 @@ class scrape_Mintos(object):
             #   print(kontostand + '\n' + Rendite + '\n' + Invest)
             f.close()
             # a.close()
-            os.system(s_loc)
+           # os.system(s_loc)
 
-    def Send_Mail(self):
+    def sendmail(self):
+        print('Function Send_Mail')
         port = 465  # For SSL
         # Create a secure SSL context
         context = ssl.create_default_context()
         # reading the file in binary mode. Because it is saved as a UTF-8 file and there is a error, if you try to convert it to ASCII
         r = open('D:/Python/webdriver/Mint.txt', "rb+")
-        message = r.read()
+        msg = MIMEMultipart()
+        msg.attach(MIMEText(r.read()))
+        msg['Subject'] = 'Mintos'
+        msg['From'] = sender_email
+        msg['To'] = receiver_email
         # print(message)
         with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
             server.login(sender_email, passwort_g)
             print("Login for E-Mail")
-            server.sendmail(sender_email, receiver_email, message)
+            server.sendmail(sender_email, receiver_email, msg.as_string())
             print("Email send")
 
 
-o = scrape_Mintos()
-o.Scrape()
-o.Send_Mail()
+o = ScrapeMintos()
+o.scrape()
+o.sendmail()
