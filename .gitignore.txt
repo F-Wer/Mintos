@@ -1,4 +1,5 @@
 Account.txt
+secret.py
 .git
 # Byte-compiled / optimized / DLL files
 __pycache__/
